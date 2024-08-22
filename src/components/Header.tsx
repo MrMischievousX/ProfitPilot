@@ -4,8 +4,12 @@ import {Feather} from './VectorIcons';
 import {COMMON} from '../constants/common';
 import {COLORS} from '../constants/colors';
 import {FONTS} from '../constants/fonts';
+import {useToast} from 'react-native-toast-notifications';
+import {userImage} from '../constants/data';
 
 const Header = () => {
+  const toast = useToast();
+
   const styles = StyleSheet.create({
     header: {
       height: COMMON.buttonHeight,
@@ -39,20 +43,26 @@ const Header = () => {
     notification: {position: 'relative'},
   });
 
+  const handleNotificationPress = () => {
+    toast.show('Feature in progress!');
+  };
+
   return (
     <View style={styles.header}>
       <View style={styles.headerIconContainer}>
-        <Image
-          style={styles.icon}
-          source={{uri: 'https://randomuser.me/api/portraits/women/43.jpg'}}
-        />
+        <Image style={styles.icon} source={{uri: userImage}} />
         <View style={styles.headerContent}>
           <Text style={styles.body}>Welcome back,</Text>
           <Text style={styles.userName}>Sarah Muller</Text>
         </View>
       </View>
       <View style={styles.notification}>
-        <Feather name={'bell'} color={COLORS.tertiary} size={COMMON.tabIcon} />
+        <Feather
+          onPress={handleNotificationPress}
+          name={'bell'}
+          color={COLORS.tertiary}
+          size={COMMON.tabIcon}
+        />
         <View style={styles.dot} />
       </View>
     </View>

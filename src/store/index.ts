@@ -7,6 +7,7 @@ interface AppState {
   cards: CardProps[];
   txns: TxnProps[];
   addCard: (card: CardProps) => void;
+  updateCard: (updatedCard: CardProps) => void;
   addCards: (card: CardProps[]) => void;
   addTxn: (txn: TxnProps) => void;
   addTxns: (txn: TxnProps[]) => void;
@@ -21,6 +22,17 @@ const useAppStore = create<AppState>()(
       addCard: (card: CardProps) => {
         set(state => {
           return {cards: [...state.cards, card]};
+        });
+      },
+      updateCard: (updatedCard: CardProps) => {
+        set(state => {
+          const newCards = state.cards.map(card => {
+            if (card.id === updatedCard.id) {
+              return updatedCard;
+            }
+            return card;
+          });
+          return {cards: newCards};
         });
       },
       addTxn: (txn: TxnProps) => {

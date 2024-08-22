@@ -7,23 +7,27 @@ import {COMMON} from '../constants/common';
 import {RootStackParamList} from '../types';
 import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
 import {ScrollView} from 'react-native-gesture-handler';
-import {cardData} from '../constants/data';
-import CardItem from '../components/CardItem';
-import {Header} from '../components';
-import {Ionicons} from '../components/VectorIcons';
+import {AddCard, CardItem, Header} from '../components';
 import {COLORS} from '../constants/colors';
+import useAppStore from '../store';
+import {magicSheet} from 'react-native-magic-sheet';
+import {BottomSheetView} from '@gorhom/bottom-sheet';
+import {TouchableRipple} from 'react-native-paper';
+import {window} from '../constants/layout';
+import {Ionicons} from '../components/VectorIcons';
 
 type props = StackScreenProps<RootStackParamList, 'cardScreenTab'>;
 
-const CardScreen = ({}: props) => {
+const CardScreen = ({navigation}: props) => {
   const inset = useSafeAreaInsets();
+  const {cards} = useAppStore();
 
   const tabBarHeight = useBottomTabBarHeight();
 
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#fafcfd',
+      backgroundColor: COLORS.lightBackground,
       paddingTop: inset.top,
       gap: COMMON.mediumMargin,
     },
@@ -48,8 +52,30 @@ const CardScreen = ({}: props) => {
       bottom: inset.bottom,
       position: 'absolute',
       right: COMMON.mediumSpacing,
+      overflow: 'hidden',
+    },
+    bottomSheet: {
+      paddingBottom: COMMON.largeMargin,
+      height: window.height * 0.8,
     },
   });
+
+  const handleAddCard = () => {
+    magicSheet.show(
+      () => {
+        return (
+          <BottomSheetView style={styles.bottomSheet}>
+            <AddCard />
+          </BottomSheetView>
+        );
+      },
+      {
+        enableDynamicSizing: true,
+        snapPoints: null as any,
+        enableOverDrag: false,
+      },
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -60,14 +86,25 @@ const CardScreen = ({}: props) => {
         contentContainerStyle={styles.scrollContent}>
         <Text style={styles.subHeading}>My Card</Text>
         <View style={styles.cardContainer}>
-          {cardData.map((card, index) => {
-            return <CardItem card={card} index={index} key={index} />;
+          {cards.map((card, index) => {
+            const handleCardPress = () => {
+              navigation.navigate('cardDetails', {cardDetails: card});
+            };
+
+            return (
+              <CardItem
+                handleCardPress={handleCardPress}
+                card={card}
+                index={index}
+                key={index}
+              />
+            );
           })}
         </View>
       </ScrollView>
-      <View style={styles.addAction}>
+      <TouchableRipple onPress={handleAddCard} style={styles.addAction}>
         <Ionicons name={'add'} color={COLORS.white} size={COMMON.tabIcon} />
-      </View>
+      </TouchableRipple>
     </View>
   );
 };

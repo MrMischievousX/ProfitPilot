@@ -5,16 +5,16 @@ import {FONTS} from '../constants/fonts';
 import {CardProps} from '../types';
 import {COLORS} from '../constants/colors';
 import {COMMON, STYLE} from '../constants/common';
-
-const CARDCOLORS = ['#87dcfb', 'lightgrey', '#bedcc0'];
-const LINECOLORS = ['#446e7e', 'grey', '#5f6e60'];
+import {CARDCOLORS, LINECOLORS} from '../constants/data';
+import {TouchableRipple} from 'react-native-paper';
 
 interface props {
   index: number;
   card: CardProps;
+  handleCardPress: () => void;
 }
 
-const CardItem = ({card, index}: props) => {
+const CardItem = ({card, index, handleCardPress}: props) => {
   const {cardNumber, date} = card;
 
   const styles = StyleSheet.create({
@@ -22,7 +22,7 @@ const CardItem = ({card, index}: props) => {
       width: '100%',
       height: 224,
       borderRadius: COMMON.largeSpacing,
-      borderWidth: 1,
+      borderWidth: COMMON.borderWidth,
       borderColor: COLORS.lightGrey,
       ...STYLE.lightShadow,
     },
@@ -60,38 +60,40 @@ const CardItem = ({card, index}: props) => {
   });
 
   return (
-    <View style={styles.container}>
-      <View style={styles.cardStart}>
-        <CardLine
-          style={styles.cardLine}
-          stroke={LINECOLORS[index % CARDCOLORS.length]}
-        />
-        <Nfc width={COMMON.tabIcon} height={COMMON.tabIcon} />
-        <View style={styles.cardNumberContainer}>
-          {cardNumber.split(' ').map((number, ind) => {
-            return (
-              <Text style={styles.cardNumber} key={ind}>
-                {number}
-              </Text>
-            );
-          })}
+    <TouchableRipple onPress={handleCardPress} style={styles.container}>
+      <>
+        <View style={styles.cardStart}>
+          <CardLine
+            style={styles.cardLine}
+            stroke={LINECOLORS[index % CARDCOLORS.length]}
+          />
+          <Nfc width={COMMON.tabIcon} height={COMMON.tabIcon} />
+          <View style={styles.cardNumberContainer}>
+            {cardNumber.match(/.{1,4}/g)?.map((number, ind) => {
+              return (
+                <Text style={styles.cardNumber} key={ind}>
+                  {number}
+                </Text>
+              );
+            })}
+          </View>
         </View>
-      </View>
-      <View style={styles.cardEnd}>
-        <View style={styles.nameContainer}>
-          <Text style={{...FONTS.primaryTextBold, color: COLORS.tertiary}}>
-            Sarah Muller
-          </Text>
-          <Text style={{...FONTS.primaryText, color: COLORS.tertiary}}>
-            Exp <Text style={styles.bold}>{date}</Text>
-          </Text>
+        <View style={styles.cardEnd}>
+          <View style={styles.nameContainer}>
+            <Text style={{...FONTS.primaryTextBold, color: COLORS.tertiary}}>
+              {card.name}
+            </Text>
+            <Text style={{...FONTS.primaryText, color: COLORS.tertiary}}>
+              Exp <Text style={styles.bold}>{date}</Text>
+            </Text>
+          </View>
+          <Visa
+            width={COMMON.mediumMargin * 11}
+            height={COMMON.mediumMargin * 11}
+          />
         </View>
-        <Visa
-          width={COMMON.mediumMargin * 11}
-          height={COMMON.mediumMargin * 11}
-        />
-      </View>
-    </View>
+      </>
+    </TouchableRipple>
   );
 };
 

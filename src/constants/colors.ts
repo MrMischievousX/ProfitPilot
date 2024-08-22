@@ -12,4 +12,6 @@ export const COLORS = {
   tabGrey: '#c0c0c0',
   error: 'red',
   lightBackground: '#fafcfd',
+  sheetHandle: '#bcbcbc',
+  transparent: 'transparent',
 };

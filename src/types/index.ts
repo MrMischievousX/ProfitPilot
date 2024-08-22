@@ -1,8 +1,11 @@
+import {TLineChartDataProp} from 'react-native-wagmi-charts';
+
 export type CardProps = {
-  balance: string;
+  balance: number;
   cardNumber: string;
   date: string;
   id: number;
+  name: string;
 };
 
 export type TxnProps = {
@@ -26,5 +29,8 @@ export type RootStackParamList = {
   // screens
   onboardingScreen: {} | undefined;
   cardDetails: {cardDetails: CardProps};
-  transferScreen: {} | undefined;
+};
+
+export type YearlyChartData = {
+  [key: string]: TLineChartDataProp;
 };

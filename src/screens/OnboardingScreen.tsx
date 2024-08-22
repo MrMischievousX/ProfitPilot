@@ -55,7 +55,7 @@ const OnboardingScreen = ({}: props) => {
   });
 
   const handlePress = () => {
-    navigation.navigate('homeRoutes');
+    navigation.replace('homeRoutes');
   };
 
   return (

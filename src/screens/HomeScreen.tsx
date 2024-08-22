@@ -1,15 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {StackNavigationProp, StackScreenProps} from '@react-navigation/stack';
-import {
-  ActivityIndicator,
-  Alert,
-  Platform,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {COLORS} from '../constants/colors';
 import {FONTS} from '../constants/fonts';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -18,10 +9,22 @@ import {window} from '../constants/layout';
 import {useNavigation} from '@react-navigation/native';
 import {CardProps, RootStackParamList} from '../types';
 import {Ionicons} from '../components/VectorIcons';
-import {ActionButton, Card, Header, TxnItem} from '../components';
+import {
+  ActionButton,
+  AddCard,
+  Card,
+  Header,
+  Loader,
+  TransferMoney,
+  TxnItem,
+} from '../components';
 import {cardData, txnData} from '../constants/data';
 import useAppStore from '../store';
 import Animated, {LinearTransition} from 'react-native-reanimated';
+import {BottomSheetView} from '@gorhom/bottom-sheet';
+import {magicSheet} from 'react-native-magic-sheet';
+import {TouchableRipple} from 'react-native-paper';
+import {useToast} from 'react-native-toast-notifications';
 
 type props = StackScreenProps<RootStackParamList, 'homeScreenTab'>;
 
@@ -30,6 +33,7 @@ const HomeScreen = ({}: props) => {
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const inset = useSafeAreaInsets();
+  const toast = useToast();
 
   const {cards, txns, addCards, addTxns} = useAppStore();
 
@@ -67,6 +71,7 @@ const HomeScreen = ({}: props) => {
       justifyContent: 'center',
       alignItems: 'center',
       borderRadius: COMMON.largeIcon,
+      overflow: 'hidden',
     },
     txnContainer: {
       flex: 1,
@@ -83,7 +88,7 @@ const HomeScreen = ({}: props) => {
     txnHandle: {
       width: COMMON.tabIcon,
       height: COMMON.smallMargin,
-      backgroundColor: '#bcbcbc',
+      backgroundColor: COLORS.sheetHandle,
       alignSelf: 'center',
       borderRadius: COMMON.tabIcon,
     },
@@ -96,10 +101,9 @@ const HomeScreen = ({}: props) => {
     txns: {gap: COMMON.mediumSpacing, marginTop: COMMON.mediumSpacing},
     scrollContainer: {flex: 1},
     listContent: {gap: COMMON.mediumSpacing},
-    loader: {
-      ...StyleSheet.absoluteFillObject,
-      justifyContent: 'center',
-      alignItems: 'center',
+    bottomSheet: {
+      paddingBottom: COMMON.largeMargin,
+      height: window.height * 0.8,
     },
   });
 
@@ -114,19 +118,42 @@ const HomeScreen = ({}: props) => {
   );
 
   const handleRequestClick = () => {
-    Alert.alert('Amount Requested', '', [{text: 'OK'}]);
+    toast.show('Amount Requested');
   };
 
   const handleTransferClick = () => {
-    navigation.navigate('transferScreen');
+    magicSheet.show(
+      () => {
+        return (
+          <BottomSheetView style={styles.bottomSheet}>
+            <TransferMoney />
+          </BottomSheetView>
+        );
+      },
+      {
+        enableDynamicSizing: true,
+        snapPoints: null as any,
+        enableOverDrag: false,
+      },
+    );
   };
 
-  useEffect(() => {
-    if (Platform.OS === 'android') {
-      StatusBar.setBackgroundColor(COLORS.lightBackground);
-    }
-    StatusBar.setBarStyle('dark-content');
-  }, []);
+  const handleAddCard = () => {
+    magicSheet.show(
+      () => {
+        return (
+          <BottomSheetView style={styles.bottomSheet}>
+            <AddCard />
+          </BottomSheetView>
+        );
+      },
+      {
+        enableDynamicSizing: true,
+        snapPoints: null as any,
+        enableOverDrag: false,
+      },
+    );
+  };
 
   useEffect(() => {
     (() => {
@@ -144,9 +171,7 @@ const HomeScreen = ({}: props) => {
     <View style={styles.container}>
       <Header />
       {isLoading ? (
-        <View style={styles.loader}>
-          <ActivityIndicator size={'large'} color={COLORS.primary} />
-        </View>
+        <Loader />
       ) : (
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -179,13 +204,13 @@ const HomeScreen = ({}: props) => {
               icon="arrow-up-right"
               onPress={handleTransferClick}
             />
-            <View style={styles.addAction}>
+            <TouchableRipple style={styles.addAction} onPress={handleAddCard}>
               <Ionicons
                 name={'add'}
                 color={COLORS.white}
                 size={COMMON.tabIcon}
               />
-            </View>
+            </TouchableRipple>
           </View>
           <View style={styles.txnContainer}>
             <View style={styles.txnHandle} />

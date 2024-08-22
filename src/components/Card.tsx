@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   GestureResponderEvent,
   Pressable,
@@ -11,13 +11,13 @@ import {COLORS} from '../constants/colors';
 import {COMMON} from '../constants/common';
 import {UsFlag, Visa} from '../assets/svg';
 import {BlurView} from '@react-native-community/blur';
-import {AntDesign} from './VectorIcons';
+import {Feather} from './VectorIcons';
 import {CardProps} from '../types';
 import currency from 'currency.js';
 import Animated, {FadeIn, FadeInDown, FadeInUp} from 'react-native-reanimated';
 import {FONTS} from '../constants/fonts';
-
-const CARDCOLORS = ['#87dcfb', 'lightgrey', '#bedcc0'];
+import {TouchableRipple} from 'react-native-paper';
+import {CARDCOLORS} from '../constants/data';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -30,6 +30,8 @@ interface props {
 
 export const Card = ({index = 0, card, onPress, isInStats}: props) => {
   const {balance, cardNumber, date} = card;
+
+  const [isBalanceHidden, setIsBalanceHidden] = useState(true);
 
   const styles = StyleSheet.create({
     container: {
@@ -58,7 +60,7 @@ export const Card = ({index = 0, card, onPress, isInStats}: props) => {
       overflow: 'hidden',
       paddingLeft: COMMON.mediumMargin,
       paddingRight: COMMON.mediumSpacing,
-      paddingVertical: 10,
+      paddingVertical: COMMON.btnPadding,
       gap: COMMON.mediumMargin,
     },
     flagIcon: {
@@ -69,7 +71,7 @@ export const Card = ({index = 0, card, onPress, isInStats}: props) => {
     },
     balance: {
       ...FONTS.primaryText,
-      color: isInStats ? '#8799ae' : COLORS.white,
+      color: isInStats ? COLORS.grey : COLORS.white,
     },
     balanceContent: {
       flexDirection: 'row',
@@ -83,7 +85,7 @@ export const Card = ({index = 0, card, onPress, isInStats}: props) => {
       justifyContent: 'center',
       alignItems: 'center',
       borderRadius: COMMON.mediumIcon / 2,
-      borderWidth: 1,
+      borderWidth: COMMON.borderWidth,
       borderColor: 'white',
       overflow: 'hidden',
     },
@@ -103,7 +105,7 @@ export const Card = ({index = 0, card, onPress, isInStats}: props) => {
     space: {gap: COMMON.smallMargin},
     descHeading: {
       ...FONTS.bodyText,
-      color: isInStats ? '#9aa8bb' : COLORS.white,
+      color: isInStats ? COLORS.grey : COLORS.white,
     },
     descSubHeading: {...FONTS.primaryTextBold, color: COLORS.tertiary},
     currency: {...FONTS.bodyTextBold, color: COLORS.tertiary},
@@ -122,7 +124,7 @@ export const Card = ({index = 0, card, onPress, isInStats}: props) => {
       <View style={styles.header}>
         <View style={styles.btn}>
           <View style={styles.flagIcon}>
-            <UsFlag width={30} height={30} />
+            <UsFlag width={COMMON.flagSize} height={COMMON.flagSize} />
           </View>
           <Text style={styles.currency}>US Dollar</Text>
         </View>
@@ -132,23 +134,25 @@ export const Card = ({index = 0, card, onPress, isInStats}: props) => {
         <Text style={styles.balance}>Your Balance</Text>
         <View style={styles.balanceContent}>
           <Text style={styles.balanceAmount} numberOfLines={1}>
-            {currency(balance).format()}
+            {isBalanceHidden ? '$XX.XX' : currency(balance).format()}
           </Text>
-          <View style={styles.eye}>
+          <TouchableRipple
+            onPress={() => setIsBalanceHidden(!isBalanceHidden)}
+            style={styles.eye}>
             <BlurView
               blurType="light"
               blurAmount={32}
               blurRadius={25}
               style={styles.eyeContainer}>
               <View style={styles.iconContainer}>
-                <AntDesign
-                  name={'eyeo'}
-                  color={isInStats ? '#8394aa' : COLORS.white}
+                <Feather
+                  name={isBalanceHidden ? 'eye-off' : 'eye'}
+                  color={isInStats ? COLORS.greyText : COLORS.white}
                   size={COMMON.tabIcon}
                 />
               </View>
             </BlurView>
-          </View>
+          </TouchableRipple>
         </View>
       </View>
       <View style={styles.descContainer}>

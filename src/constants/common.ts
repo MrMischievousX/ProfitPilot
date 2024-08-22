@@ -13,6 +13,7 @@ export const COMMON = {
   mediumMargin: dp(8),
   largeMargin: dp(12),
   xxlMargin: dp(20),
+  btnPadding: dp(10),
 
   // size
   buttonHeight: dp(56),
@@ -23,9 +24,11 @@ export const COMMON = {
   mediumIcon: dp(56),
   largeIcon: dp(64),
   qrSize: dp(300),
+  flagSize: dp(30),
 
   // boder radius
   cardRadius: dp(28),
+  borderWidth: dp(1),
 };
 
 export const STYLE = StyleSheet.create({

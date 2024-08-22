@@ -1,53 +1,27 @@
 import {CardProps, TxnProps} from '../types';
-export const chartData = [
-  {
-    timestamp: 1625945400000,
-    value: 30,
-  },
-  {
-    timestamp: 1625945400000,
-    value: 20,
-  },
-  {
-    timestamp: 1625946300000,
-    value: 37,
-  },
-  {
-    timestamp: 1625946300000,
-    value: 30,
-  },
-  {
-    timestamp: 1625947200000,
-    value: 45,
-  },
-  {
-    timestamp: 1625948100000,
-    value: 26,
-  },
-  {
-    timestamp: 1625945400000,
-    value: 57,
-  },
-];
+export const userImage = 'https://randomuser.me/api/portraits/women/43.jpg';
 
 export const cardData: CardProps[] = [
   {
     id: 1,
-    balance: '40500.80',
-    cardNumber: '1111 2222 3333 4444',
+    balance: 40500.8,
+    cardNumber: '1111222233334444',
     date: '01/28',
+    name: 'Sarah Muller',
   },
   {
     id: 2,
-    balance: '40500.80',
-    cardNumber: '1234 1234 1234 1234',
+    balance: 40500.8,
+    cardNumber: '1234123412341234',
     date: '02/28',
+    name: 'Sarah Muller',
   },
   {
     id: 3,
-    balance: '40500.80',
-    cardNumber: '1111 2222 3333 4444',
+    balance: 40500.8,
+    cardNumber: '1111222233334444',
     date: '03/28',
+    name: 'Sarah Muller',
   },
 ];
 
@@ -81,3 +55,24 @@ export const txnData: TxnProps[] = [
     time: 1723454804930,
   },
 ];
+
+export const CARDCOLORS = ['#87dcfb', 'lightgrey', '#bedcc0'];
+
+export const LINECOLORS = ['#446e7e', 'grey', '#5f6e60'];
+
+export const MONTHS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+export const WEEKS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];

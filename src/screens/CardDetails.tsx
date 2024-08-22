@@ -1,28 +1,49 @@
 import React, {useState} from 'react';
 import {StackScreenProps} from '@react-navigation/stack';
-import {StyleSheet, Text, View} from 'react-native';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {COLORS} from '../constants/colors';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {COMMON, STYLE} from '../constants/common';
-import {RootStackParamList} from '../types';
-import {Card} from '../components';
+import {RootStackParamList, YearlyChartData} from '../types';
+import {Card, CustomChart, Loader} from '../components';
 import {MaterialIcons, Octicons} from '../components/VectorIcons';
 import {FONTS} from '../constants/fonts';
 import {TouchableRipple} from 'react-native-paper';
-import {window} from '../constants/layout';
-import CustomChart from '../components/CustomChart';
+import {MONTHS, WEEKS} from '../constants/data';
 
 type props = StackScreenProps<RootStackParamList, 'cardDetails'>;
-
-const MONTHS = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
-const WEEKS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu'];
 
 const CardDetails = ({route, navigation}: props) => {
   const cardDetails = route.params?.cardDetails;
 
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [currentMonth, setCurrentMonth] = useState<string>(MONTHS[0]);
+  const [chartData, setChartData] = useState<YearlyChartData | null>(null);
+
+  const generateYearlyChartData = () => {
+    const data: YearlyChartData = {};
+
+    MONTHS.forEach((month, index) => {
+      const daysInMonth = new Date(2024, index + 1, 0).getDate();
+      data[month] = [];
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const timestamp = new Date(2024, index, day).getTime();
+        const value = Math.floor(Math.random() * 50 + 10);
+
+        data[month].push({timestamp, value});
+      }
+    });
+
+    setChartData(data);
+    setIsLoading(false);
+  };
 
   const inset = useSafeAreaInsets();
+
+  React.useEffect(() => {
+    generateYearlyChartData();
+  }, []);
 
   const styles = StyleSheet.create({
     container: {
@@ -41,14 +62,14 @@ const CardDetails = ({route, navigation}: props) => {
     backIcon: {position: 'absolute', left: 0},
     title: {...FONTS.primaryTextBold, color: COLORS.tertiary},
     monthContainer: {
-      width: window.width - COMMON.tabIcon,
       flexDirection: 'row',
       backgroundColor: COLORS.white,
-      justifyContent: 'space-between',
-      paddingHorizontal: COMMON.smallMargin,
       paddingVertical: COMMON.smallMargin,
-      borderRadius: COMMON.largeMargin * 4,
+    },
+    monthBox: {
       marginTop: COMMON.mediumSpacing,
+      borderRadius: COMMON.largeMargin * 4,
+      overflow: 'hidden',
     },
     monthBtn: {
       width: COMMON.largeMargin * 4,
@@ -63,8 +84,8 @@ const CardDetails = ({route, navigation}: props) => {
       backgroundColor: COLORS.white,
       marginTop: COMMON.mediumSpacing,
       borderRadius: COMMON.cardRadius,
-      borderWidth: 1,
-      borderColor: '#e1e1e1',
+      borderWidth: COMMON.borderWidth,
+      borderColor: COLORS.lightGrey,
       justifyContent: 'space-between',
       ...STYLE.lightShadow,
     },
@@ -102,6 +123,10 @@ const CardDetails = ({route, navigation}: props) => {
       letterSpacing: -0.2,
       color: COLORS.tertiary,
     },
+    monthContentContainer: {
+      justifyContent: 'space-between',
+      paddingHorizontal: COMMON.smallMargin,
+    },
   });
 
   return (
@@ -116,53 +141,77 @@ const CardDetails = ({route, navigation}: props) => {
         />
         <Text style={styles.title}>Statistic</Text>
       </View>
-      <Card card={cardDetails} isInStats />
-      <View style={styles.monthContainer}>
-        {MONTHS.map((month, index) => {
-          return (
-            <TouchableRipple
-              key={index}
-              onPress={() => setCurrentIndex(index)}
-              style={[
-                styles.monthBtn,
-                {
-                  backgroundColor:
-                    index === currentIndex ? COLORS.primary : COLORS.white,
-                },
-              ]}>
-              <Text
-                style={{
-                  ...FONTS.bodyText,
-                  color:
-                    index === currentIndex ? COLORS.tertiary : COLORS.greyText,
-                }}>
-                {month}
-              </Text>
-            </TouchableRipple>
-          );
-        })}
-      </View>
-      <View style={styles.chartContainer}>
-        <View style={styles.cardHeader}>
-          <Text style={styles.txnText}>Transaction</Text>
-          <View style={styles.btn}>
-            <Text style={styles.btnText}>Earnings</Text>
-            <Octicons name={'chevron-down'} color={COLORS.grey} size={20} />
-          </View>
-        </View>
+      {isLoading ? (
+        <Loader />
+      ) : (
         <>
-          <CustomChart />
-          <View style={styles.weekContainer}>
-            {WEEKS.map((month, index) => {
-              return (
-                <Text style={FONTS.bodyText} key={index}>
-                  {month}
-                </Text>
-              );
-            })}
+          <Card card={cardDetails} isInStats />
+          <View style={styles.monthBox}>
+            <ScrollView
+              showsHorizontalScrollIndicator={false}
+              style={styles.monthContainer}
+              horizontal
+              contentContainerStyle={styles.monthContentContainer}>
+              {MONTHS.map((month, index) => {
+                return (
+                  <TouchableRipple
+                    key={index}
+                    onPress={() => setCurrentMonth(month)}
+                    style={[
+                      styles.monthBtn,
+                      {
+                        backgroundColor:
+                          month === currentMonth
+                            ? COLORS.primary
+                            : COLORS.white,
+                      },
+                    ]}>
+                    <Text
+                      style={{
+                        ...FONTS.bodyText,
+                        color:
+                          month === currentMonth
+                            ? COLORS.tertiary
+                            : COLORS.greyText,
+                      }}>
+                      {month}
+                    </Text>
+                  </TouchableRipple>
+                );
+              })}
+            </ScrollView>
+          </View>
+          <View style={styles.chartContainer}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.txnText}>Transaction</Text>
+              <View style={styles.btn}>
+                <Text style={styles.btnText}>Earnings</Text>
+                <Octicons
+                  name={'chevron-down'}
+                  color={COLORS.grey}
+                  size={COMMON.xxlMargin}
+                />
+              </View>
+            </View>
+            <>
+              {chartData && (
+                <CustomChart
+                  chartData={chartData[currentMonth as keyof typeof chartData]}
+                />
+              )}
+              <View style={styles.weekContainer}>
+                {WEEKS.map((month, index) => {
+                  return (
+                    <Text style={FONTS.bodyText} key={index}>
+                      {month}
+                    </Text>
+                  );
+                })}
+              </View>
+            </>
           </View>
         </>
-      </View>
+      )}
     </View>
   );
 };
